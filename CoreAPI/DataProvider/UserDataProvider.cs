@@ -14,6 +14,7 @@ namespace CoreAPI.DataProvider
     public interface IUserDataProvider
     {
         Task<User> Authenticate(string username, string password);
+        Task<User> GetByUserNumber(string userNumber);
     }
     public class UserDataProvider : IUserDataProvider
     {
@@ -60,6 +61,36 @@ namespace CoreAPI.DataProvider
                 return user;
             }
         }
-        
+
+        public async Task<User> GetByUserNumber(string userNumber)
+        {
+            var nik = userNumber;
+            using (var sqlConnection = new SqlConnection(connectionString))
+            {
+                await sqlConnection.OpenAsync();
+                var dynamicParameters = new DynamicParameters();
+                dynamicParameters.Add("@pPERNR", nik);
+                IEnumerable extension = sqlConnection.QuerySingleOrDefault("bioumum.usp_GetEmployeeByPERNR", dynamicParameters, commandType: CommandType.StoredProcedure);
+
+                User user = new User();
+                if (extension != null)
+                {
+                    var castItem = (IDictionary<string, object>)extension;
+                    user = new User
+                    {
+                        Name = castItem["CNAME"].ToString(),
+                        UserId = castItem["PERNR"].ToString(),
+                        PositionId = castItem["POSID"].ToString(),
+                        PositionName = castItem["PRPOS"].ToString(),
+                        UnitCode = castItem["ORGCD"].ToString(),
+                        UnitName = castItem["PRORG"].ToString(),
+                        Grade = castItem["PSGRP"].ToString()
+                    };
+                }
+
+                return user;
+            }
+        }
+
     }
 }
