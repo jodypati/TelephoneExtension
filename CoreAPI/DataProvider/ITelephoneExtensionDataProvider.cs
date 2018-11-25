@@ -10,7 +10,7 @@ namespace CoreAPI.DataProvider
 
         Task<TelephoneExtension> GetExtension(int RecordId);
 
-        Task AddExtension(TelephoneExtension TelephoneExtension);
+        Task<int> AddExtension(TelephoneExtension TelephoneExtension);
 
         Task UpdateExtension(TelephoneExtension TelephoneExtension);
 
